@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ReactMapGL, { Marker } from "react-map-gl";
+import MapboxGL from "mapbox-gl";
 import Pin from "./Pin";
 class Map extends Component {
   constructor(props) {
@@ -7,12 +7,10 @@ class Map extends Component {
 
     this.state = {
       api_url: "http://data.edmonton.ca/resource/87ck-293k.json",
+      map: false,
       viewport: {
-        width: 1400,
-        height: 768,
-        latitude: 53.5444,
-        longitude: -113.4909,
-        zoom: 12
+        zoom: 12,
+        center: [-113.4909, 53.5444]
       },
       coords: [
         { latitude: 53.5224, longitude: -113.4098 },
@@ -24,37 +22,73 @@ class Map extends Component {
       data: null
     };
   }
+  initializeMap() {
+    MapboxGL.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
+    let map = new MapboxGL.Map({
+      container: "map",
+      style: "mapbox://style/mapbox/light-v9",
+      ...this.state.viewport
+    });
+
+    map.on("load", () => {
+      map.addLayer({
+        id: "points",
+        type: "circle",
+        source: {
+          type: "geojson",
+          data: this.state.data
+        },
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "#B4D455"
+        }
+      });
+    });
+    this.setState({ map });
+  }
+
+  createFeatureCollection(data) {
+    let features = [];
+    data.forEach(point => {
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [
+            parseFloat(point.location.longitude),
+            parseFloat(point.location.latitude)
+          ]
+        },
+        properties: {
+          description: point.description,
+          details: point.details,
+          duration: point.duration,
+          impact: point.impact
+        }
+      });
+    });
+
+    return {
+      type: "FeatureCollection",
+      features: features
+    };
+  }
 
   componentDidMount() {
     const { data, api_url } = this.state;
+
     if (!data) {
       fetch(api_url, { method: "GET" })
         .then(response => response.json())
+        .then(response => this.createFeatureCollection(response))
         .then(response => this.setState({ data: response }));
     }
   }
   render() {
-    const { coords,data } = this.state;
-    return (
-      <ReactMapGL
-        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        {...this.state.viewport}
-        onViewportChange={viewport => this.setState({ viewport })}
-      >
-        {data &&
-          data.map((coord, i) => (
-            <Marker
-              key={`Marker-${i * (Math.random() * 200 + 1)}`}
-              latitude={parseFloat(coord.location.latitude)}
-              longitude={parseFloat(coord.location.longitude)}
-              // latitude={coord.latitude}
-              // longitude={coord.longitude}
-            >
-              <Pin />
-            </Marker>
-          ))}
-      </ReactMapGL>
-    );
+    const { data, map } = this.state;
+    if (data && !map) this.initializeMap();
+
+    return <div style={{ width: 1100, height: 600 }} id="map" />;
   }
 }
 
