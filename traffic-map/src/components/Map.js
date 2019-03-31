@@ -1,6 +1,5 @@
-import React, { Component } from "react";
 import MapboxGL from "mapbox-gl";
-import Pin from "./Pin";
+import React, { Component } from "react";
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -22,12 +21,12 @@ class Map extends Component {
       data: null
     };
   }
-  initializeMap() {
+  static initializeMap(state) {
     MapboxGL.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
     let map = new MapboxGL.Map({
       container: "map",
       style: "mapbox://style/mapbox/light-v9",
-      ...this.state.viewport
+      ...state.viewport
     });
 
     map.on("load", () => {
@@ -36,7 +35,7 @@ class Map extends Component {
         type: "circle",
         source: {
           type: "geojson",
-          data: this.state.data
+          data: state.data
         },
         paint: {
           "circle-radius": 8,
@@ -79,9 +78,15 @@ class Map extends Component {
       map.getCanvas().style.cursor = "";
     });
 
-    this.setState({ map });
+    return map;
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { data, map } = prevState;
+
+    if (data && !map) return Map.initializeMap(prevState);
+    else return null;
+  }
   createFeatureCollection(data) {
     let features = [];
     data.forEach(point => {
@@ -120,9 +125,6 @@ class Map extends Component {
     }
   }
   render() {
-    const { data, map } = this.state;
-    if (data && !map) this.initializeMap();
-
     return <div style={{ width: 1100, height: 600 }} id="map" />;
   }
 }
