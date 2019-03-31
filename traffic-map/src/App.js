@@ -1,7 +1,13 @@
 import React, { Component } from "react";
-import Header from './components/Header.js';
-import logo from "./logo.svg";
+import {Container} from 'reactstrap';
+import Header from './components/Header';
+import Map from './components/Map';
+// import logo from "./logo.svg";
 import "./App.css";
+
+require('dotenv').config()
+
+
 
 class App extends Component {
   constructor(props) {
@@ -14,9 +20,11 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div>
         <Header appName={this.state.applicationName}/>
-        <div id="map" />
+        <Container>
+          <Map/>
+        </Container>
       </div>
     );
   }
