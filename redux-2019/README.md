@@ -66,3 +66,24 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+
+#Start off by accessing the current state:
+store.getState()
+
+
+#Register the callback with:
+store.subscribe(() => console.log('Look ma, Redux!!'))
+
+
+#To change the state in Redux we need to dispatch an action. To dispatch an action you have to call the dispatch method.
+store.dispatch( addArticle({ title: 'React Redux Tutorial for Beginners', id: 1 }) )
+
+
+<!-- Take your time to explore these three Redux methods as an exercise. Play with them from the console:
+
+getState for accessing the current state of the application
+dispatch for dispatching an action
+subscribe for listening on state changes 
+-->
