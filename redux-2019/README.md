@@ -82,7 +82,6 @@ store.dispatch( addArticle({ title: 'React Redux Tutorial for Beginners', id: 1 
 
 
 <!-- Take your time to explore these three Redux methods as an exercise. Play with them from the console:
-
 getState for accessing the current state of the application
 dispatch for dispatching an action
 subscribe for listening on state changes 
