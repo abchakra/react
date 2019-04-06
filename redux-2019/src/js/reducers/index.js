@@ -1,7 +1,8 @@
-import { ADD_ARTICLE } from "../constants/action-types";
+import { ADD_ARTICLE, DATA_LOADED } from "../constants/action-types";
 
 const initialState = {
-  articles: []
+  articles: [],
+  remoteArticles: []
 };
 function rootReducer(state = initialState, action) {
   // When the action type matches a valid clause the reducer calculates the next state and returns a new object.
@@ -15,6 +16,12 @@ function rootReducer(state = initialState, action) {
     });
   }
 
+  
+  if (action.type === DATA_LOADED) {
+    return Object.assign({}, state, {
+      remoteArticles: state.remoteArticles.concat(action.payload)
+    });
+  }
   //   it should return at least the initial state when no action type matches.
   return state;
 }
